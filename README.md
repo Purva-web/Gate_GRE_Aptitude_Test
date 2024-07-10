@@ -45,6 +45,11 @@ This project is a simple quiz application that lets users answer multiple-choice
 -   **Correct Answer Animation**: Adds a green background and bubble effects to the correct answer button.
 -   **Incorrect Answer Animation**: Adds a shake effect to the incorrect answer button.
 
+## Pictures 🖼
+![image](https://github.com/LuVaAcAn/Quiz-WebApp/assets/107821071/30375073-3d56-43c1-8b2b-02e29acd871b)
+![image](https://github.com/LuVaAcAn/Quiz-WebApp/assets/107821071/0a8856dd-874e-4b8d-b3cd-70b1cb591799)
+![image](https://github.com/LuVaAcAn/Quiz-WebApp/assets/107821071/73658384-4264-469f-b8bd-b51786328520)
+
 ## Enjoy the Quiz! 🥳
 
 Feel free to explore and modify the code to create your own quiz questions and customize the styles and animations. Have fun!
