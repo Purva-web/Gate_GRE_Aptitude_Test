@@ -1,0 +1,28 @@
+{
+  "name": "quiz-webapp",
+  "version": "1.0.0",
+  "description": "This project is a simple quiz application that lets users answer multiple-choice questions and receive immediate feedback. The app includes cool animations for correct and incorrect answers to make the experience more engaging.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuVaAcAn/Quiz-WebApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LuVaAcAn/Quiz-WebApp/issues"
+  },
+  "homepage": "https://github.com/LuVaAcAn/Quiz-WebApp#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "lowdb": "^3.0.0",
+    "mongoose": "^8.18.1"
+  }
+}

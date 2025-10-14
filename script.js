@@ -1,120 +1,81 @@
-const questions = [
-    {
-        question: "Who is the creator of Chainsaw Man?",
-        answers:[
-            {text: "Kōhei Horikosh", correct: false},
-            {text: "Tatsuki Fujimoto", correct: true},
-            {text: "Hajime Isayama", correct: false},
-            {text: "Masashi Kishimoto", correct: false},
-        ]
-    },
-    {
-        question: "Who does Denji consider his family?",
-        answers:[
-            {text: "Reze & Makima", correct: false},
-            {text: "Kobeni & Himeno", correct: false},
-            {text: "Aki & Power", correct: true},
-            {text: "Fumiko & Yoshida", correct: false},
-        ]
-    },
-    {
-        question: "What was Pochita's contract to revive Denji?",
-        answers:[
-            {text: "Tell him about his dreams", correct: true},
-            {text: "His soul", correct: false},
-            {text: "Hugs", correct: false},
-            {text: "An eye", correct: false},
-        ]
-    },
-    {
-        question: "How many are Quanxi's girlfriends?",
-        answers:[
-            {text: "4", correct: true},
-            {text: "7", correct: false},
-            {text: "10", correct: false},
-            {text: "2", correct: false},
-        ]
+// Typing animation
+const text = "Unlock Your Potential...";
+let i = 0;
+function typeWriter() {
+  const elem = document.getElementById("typing-text");
+  if (i < text.length) {
+    elem.innerHTML += text.charAt(i);
+    i++;
+    setTimeout(typeWriter, 120);
+  }
+}
+typeWriter();
+
+// Show sub-options with fade effect
+function showSubOptions(exam) {
+  // Fade out other main options
+  document.querySelectorAll('.main-option').forEach(option => {
+    if(option.id !== exam) {
+      option.style.transition = "opacity 0.5s ease";
+      option.style.opacity = 0;
+      setTimeout(() => option.style.display = 'none', 500);
     }
-];
+  });
 
-const questionElement = document.getElementById("question");
-const answerButton = document.getElementById("answer-buttons");
-const nextButton = document.getElementById("next-btn");
-
-let currentQuestionIndex = 0;
-let score = 0;
-
-function startQuiz(){
-    currentQuestionIndex = 0;
-    score = 0;
-    nextButton.innerHTML = "Next";
-    nextButton.style.display = "none";
-    showQuestion();
+  // Show relevant sub-options
+  document.querySelectorAll('.sub-options').forEach(sub => sub.style.display = 'none');
+  const element = document.getElementById('sub-' + exam);
+  element.style.display = 'flex';
+  element.style.opacity = 0;
+  element.style.transition = "opacity 0.5s ease";
+  setTimeout(() => element.style.opacity = 1, 10);
 }
 
-function showQuestion(){
-    resetState();
-    let currentQuestion = questions[currentQuestionIndex];
-    let questionNo = currentQuestionIndex + 1;
-    questionElement.innerHTML = questionNo + ". " + currentQuestion.question;
-    
-    currentQuestion.answers.forEach(answer => {
-        const button = document.createElement("button");
-        button.innerHTML = answer.text;
-        button.classList.add("quiz-btn");
-        answerButton.appendChild(button);
-        if (answer.correct) {
-            button.dataset.correct = answer.correct;
-        }
-        button.addEventListener("click", selectAnswer);
-    });
+// Start Quiz
+function startQuiz(exam, subCategory) {
+  alert(`Starting ${exam} - ${subCategory} Quiz`);
+  // Connect this to your existing quiz page or load quiz dynamically
 }
 
-function resetState(){
-    nextButton.style.display = "none";
-    while (answerButton.firstChild) {
-        answerButton.removeChild(answerButton.firstChild);
-    }
+// Particle animation on right panel
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
+
+const particles = [];
+for(let i=0; i<100; i++){
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 3 + 1,
+    speedX: (Math.random()-0.5)*2,
+    speedY: (Math.random()-0.5)*2
+  });
 }
 
-function selectAnswer(e){
-    const selectedBtn = e.target;
-    const isCorrect = selectedBtn.dataset.correct === "true";
-    if (!isCorrect) {
-        selectedBtn.classList.add("incorrect");
-        selectedBtn.classList.add("shake");
-        setTimeout(() => {
-            selectedBtn.classList.remove("shake");
-        }, 650);
-    } else {
-        score++;
-        selectedBtn.classList.add("correct");
-        selectedBtn.classList.add("animatedbtn");
-        setTimeout(() => {
-            selectedBtn.classList.remove("animatedbtn");
-        }, 650);
-    }
-    Array.from(answerButton.children).forEach(button => {
-        button.disabled = true;
-    });
-    nextButton.style.display = "block";
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
+    ctx.fill();
+    p.x += p.speedX;
+    p.y += p.speedY;
+    if(p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+    if(p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+function startQuiz(main, sub, event) {
+  event.stopPropagation(); // Prevent parent click from toggling dropdown
+  window.location.href = `${main}_${sub}.html`; // Redirect to correct HTML page
 }
 
-nextButton.addEventListener("click", () => {
-    currentQuestionIndex++;
-    if (currentQuestionIndex < questions.length) {
-        showQuestion();
-    } else {
-        showResults();
-    }
+// Handle window resize
+window.addEventListener('resize', () => {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
 });
-
-function showResults(){
-    resetState();
-    questionElement.innerHTML = `You scored ${score} out of ${questions.length}!`;
-    nextButton.innerHTML = "Restart";
-    nextButton.style.display = "block";
-    nextButton.addEventListener("click", startQuiz, { once: true });
-}
-
-startQuiz();

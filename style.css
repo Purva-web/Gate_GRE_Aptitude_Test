@@ -1,180 +1,131 @@
-*{
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-:root{
-    --gray: #222;
-    --darkgray: #181818;
-    --white: #FFF;
-    --lightgray: #f0f0f0;
-    --navyblue: #001E4D;
-    --green: #00d400;
+
+body, html {
+  height: 100%;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
 }
-body{
-    background: var(--gray);
+
+.container {
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
-.container{
-    margin: 3%;
+
+
+/* LEFT PANEL */
+.left-panel {
+  width: 45%;
+  background: rgba(102, 120, 252, 0.15);
+  backdrop-filter: blur(15px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 50px;
 }
-.app{
-    background-color: var(--white);
-    width: 90%;
-    max-width: 600px;
-    margin: 100px auto 0;
-    border-radius: 10px;
-    padding: 30px;
+
+.left-panel h1 {
+  font-size: 3em;
+  margin-bottom: 10px;
+  color: #000000;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
 }
-.app h1{
-    font-size: 40px;
-    text-transform: uppercase;
-    color: var(--navyblue);
-    font-weight: 800;
-    border-bottom: 1px solid var(--gray);
-    padding-bottom: 10px;
+
+.left-panel p {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+  color: #000000;
 }
-.quiz{
-    padding: 20px 0;
+
+.option, .sub-option {
+  padding: 20px 40px;
+  margin: 15px 0;
+  border-radius: 15px;
+  background: rgba(179, 179, 179, 0.25);
+  color: #000000;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
-#question{
-    font-size: 18px;
-    color: var(--navyblue);
-    font-weight: 600;
+
+/* Main option container */
+.option {
+  background: white;  /* keep main container white */
+  color: black;
+  padding: 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-.quiz-btn{
-    background: var(--lightgray);
-    color: var(--gray);
-    font-weight: 500;
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    text-align: left;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+
+.option:hover {
+  /* Remove background change on hover */
+  background: white;
+  transform: translateY(-2px); /* optional lift effect */
 }
-.quiz-btn, #next-btn{
-    transition: all 0.2s ease;
+
+/* Sub-options inside main option */
+.sub-option {
+  background: #b187fc;  /* colored background for sub-option */
+  color: white;
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
-.quiz-btn:hover, .quiz-btn.correct, .quiz-btn.incorrect{
-    color: var(--white);
+
+.sub-option:hover {
+  background: #9c6efc;  /* slightly darker shade on hover */
+  transform: translateY(-2px);
 }
-.quiz-btn:hover{
-    background: var(--gray);
-    transform: scale(1.01);
+
+.sub-options {
+  display: none;
+  margin-top: 20px;
+  flex-direction: column;
 }
-#next-btn{
-    background-color: var(--gray);
-    color: var(--white);
-    font-weight: 500;
-    width: 150px;
-    font-size: 20px;
-    border: 0;
-    padding: 10px;
-    margin: 0px 0px 20px auto;
-    border-radius: 10px;
-    cursor: pointer;
-    display: none;
+
+/* RIGHT PANEL */
+.right-panel {
+  width: 55%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea, #7b4bab);
+  color: white;
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
 }
-#next-btn:hover{
-    width: 160px;
+
+.typing-text {
+  position: absolute;
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 3px 3px 15px rgba(0,0,0,0.3);
 }
-#next-btn:active{
-    background: var(--darkgray);
-}
-.quiz-btn:active, #next-btn:active{
-    transform: scale(0.98);
-}
-.quiz-btn.correct{
-    position: relative;
-    background-color: var(--green);
-}
-.quiz-btn.animatedbtn{
-    animation: correctBtn 0.6s ease-in-out;
-}
-.quiz-btn.animatedbtn::before, .quiz-btn.animatedbtn::after{
-    content: "";
-    position: absolute;
-    left: 50%;
-    height: 110%;
-    z-index: -1000;
-    background-repeat: no-repeat;
-}
-.quiz-btn.animatedbtn::before{
-    top: -50%;
-    transform: translateX(-40%) scale(1.5);
-    width: 44%;
-    left: 18%;
-    background-image: radial-gradient(circle, var(--green) 20%, transparent 20%), radial-gradient(circle, transparent 20%, var(--green) 20%, transparent 30%), radial-gradient(circle, var(--green) 20%, transparent 20%), radial-gradient(circle, var(--green) 20%, transparent 20%), radial-gradient(circle, transparent 10%, var(--green) 15%, transparent 20%), radial-gradient(circle, var(--green) 20%, transparent 20%), radial-gradient(circle, var(--green) 20%, transparent 20%), radial-gradient(circle, var(--green) 20%, transparent 20%), radial-gradient(circle, var(--green) 20%, transparent 20%);
-    background-size: 15% 15%, 25% 25%, 20% 20%, 25% 25%, 22% 22%, 15% 15%, 20% 20%, 15% 15%, 22% 22%;
-    animation: topBubbles 0.65s ease-in-out forwards;
-}
-@keyframes correctBtn {
-    0% {transform: scale(1);}
-    50% {transform: scaleX(1.05) scaleY(1.2);}
-    100% {transform: scale(1);}
-}
-@keyframes topBubbles {
-    0% {
-        background-position: 5% 100%, 10% 90%, 10% 90%, 15% 90%, 25% 90%, 25% 90%,
-          40% 90%, 55% 90%, 70% 90%;
-      }
-      50% {
-        background-position: 0% 95%, 0% 20%, 10% 40%, 20% 0%, 30% 30%, 22% 50%,
-          50% 50%, 65% 20%, 90% 30%;
-      }
-      100% {
-        background-position: 0% 90%, 0% 10%, 10% 30%, 20% -10%, 30% 20%, 22% 40%,
-          50% 40%, 65% 10%, 90% 20%;
-        background-size: 0 0;
-      }
-}
-.quiz-btn.animatedbtn::after{
-    width: 30%;
-    z-index: -200;
-    bottom: -70%;
-    transform: translateX(70%) scale(1.5);
-    background-image: radial-gradient(circle, var(--green) 20%, transparent 20%),
-    radial-gradient(circle, var(--green) 20%, transparent 20%),
-    radial-gradient(circle, transparent 10%, var(--green) 15%, transparent 20%),
-    radial-gradient(circle, var(--green) 20%, transparent 20%),
-    radial-gradient(circle, var(--green) 20%, transparent 20%),
-    radial-gradient(circle, var(--green) 20%, transparent 20%),
-    radial-gradient(circle, var(--green) 20%, transparent 20%);
-    background-size: 20% 20%, 35% 35%, 22% 22%, 25% 25%, 20% 20%, 25% 25%, 22% 22%;
-    animation: bottomBubbles 0.65s ease-in-out forwards;
-}
-@keyframes bottomBubbles {
-    0% {
-      background-position: 10% -10%, 30% 10%, 55% -10%, 70% -10%, 85% -10%,
-        70% -10%, 70% 0%;
-    }
-    50% {
-      background-position: 0% 80%, 20% 80%, 45% 60%, 60% 100%, 75% 70%, 95% 60%,
-        105% 0%;
-    }
-    100% {
-      background-position: 0% 90%, 20% 90%, 45% 70%, 60% 110%, 75% 80%, 95% 70%,
-        110% 10%;
-      background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
-    }
-  }
-/*.quiz-btn.correct:active, .quiz-btn.incorrect:active{
-}*/
-.quiz-btn.incorrect{
-    background-color: #ec0000;
-}
-.quiz-btn.shake {
-    animation: shake 1s ease-in;
-}
-@keyframes shake {
-    0% { transform: translateX(0); }
-    10% { transform: translateX(-3px); }
-    20% { transform: translateX(3px); }
-    30% { transform: translateX(-8px); }
-    40% { transform: translateX(8px); }
-    50% { transform: translateX(-5px); }
-    60% { transform: translateX(3px); }
-    70% { transform: translateX(0); }
+
+/* PARTICLES CANVAS */
+#particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }

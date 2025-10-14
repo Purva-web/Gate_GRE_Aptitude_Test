@@ -1,26 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz App</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz WebApp</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="subcontainer">
-            <div class="app">
-                <h1>Simple Quiz</h1>
-                <div class="quiz">
-                    <h2 id="question">Question goes here</h2>
-                    <div id="answer-buttons">
-                    </div>
-                </div>
-                <button id="next-btn">Next</button>
-            </div>
+<div class="container">
+ <div class="left-panel">
+  <div class="content">
+    <h1>Welcome to QuizMaster</h1>
+    <p>Choose your exam and unlock your potential!</p>
+
+    <div class="options">
+      <!-- GATE -->
+      <div class="option" id="GATE" onclick="showSubOptions('GATE')">
+        GATE
+        <div class="sub-options" id="sub-GATE">
+          <a class="sub-option" href="GATE_Logical.html">Logical Reasoning</a>
+          <a class="sub-option" href="GATE_Verbal.html">Verbal Ability</a>
         </div>
+      </div>
+
+      <!-- GRE -->
+      <div class="option" id="GRE" onclick="showSubOptions('GRE')">
+        GRE
+        <div class="sub-options" id="sub-GRE">
+          <a class="sub-option" href="GRE_Quantitative.html">Quantitative</a>
+          <a class="sub-option" href="GRE_Verbal.html">Verbal Reasoning</a>
+        </div>
+      </div>
+
+      <!-- Aptitude -->
+      <div class="option" id="Aptitude" onclick="showSubOptions('Aptitude')">
+        Aptitude
+        <div class="sub-options" id="sub-Aptitude">
+          <a class="sub-option" href="Aptitude_Logical.html">Logical Reasoning</a>
+          <a class="sub-option" href="Aptitude_Quantitative.html">Quantitative Ability</a>
+        </div>
+      </div>
     </div>
-    <script src="script.js"></script>
+  </div>
+</div>
+
+  <div class="right-panel">
+    <canvas id="particles"></canvas>
+    <div class="typing-text" id="typing-text"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

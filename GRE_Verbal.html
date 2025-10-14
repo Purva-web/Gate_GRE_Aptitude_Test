@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRE Verbal Reasoning</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  body {
+    background: #000;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+  body.light { background: #f4f4f4; color: #111; }
+  .quiz-container { display: flex; justify-content: center; align-items: center; width: 100%; }
+  .quiz-box {
+    background: #111;
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 420px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    text-align: center;
+    position: relative;
+    transition: background 0.3s, color 0.3s;
+  }
+  body.light .quiz-box { background: #fff; color: #111; }
+  .quiz-box h1 { font-size: 28px; color: #2467d2; margin-bottom: 15px; }
+  .home-btn, .toggle-btn {
+    position: absolute; top: 15px; background: #2467d2; color: #fff;
+    border: none; padding: 6px 12px; border-radius: 6px;
+    cursor: pointer; text-decoration: none; font-size: 14px;
+  }
+  .home-btn { left: 15px; }
+  .toggle-btn { right: 15px; }
+  .progress-bar { height: 6px; background: #333; border-radius: 5px; margin-bottom: 15px; overflow: hidden; }
+  .progress-bar #progress { height: 100%; width: 0%; background: limegreen; border-radius: 5px; transition: width 0.3s ease; }
+  #timer { font-weight: bold; margin-bottom: 10px; }
+  #question { font-size: 18px; margin: 15px 0; }
+  .answer {
+    display: block; width: 100%; padding: 10px; margin: 8px 0;
+    border: none; border-radius: 6px; cursor: pointer;
+    background: #444; color: white; transition: 0.3s;
+  }
+  .answer:hover { background: #666; }
+  .answer.correct { background: green !important; }
+  .answer.wrong { background: red !important; }
+  #next-btn, #download-btn, #start-btn {
+    background: #222; color: white; font-size: 16px;
+    padding: 10px; border: none; border-radius: 8px;
+    margin-top: 15px; cursor: pointer; display: none;
+  }
+  #next-btn:hover, #download-btn:hover, #start-btn:hover { background: #444; }
+  #instructions {
+    text-align: left;
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <div class="quiz-box">
+    <a href="index.html" class="home-btn">Home</a>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙 Dark Mode</button>
+
+    <!-- Instructions Screen -->
+    <div id="intro-screen">
+      <h1>GRE Verbal Reasoning</h1>
+      <div id="instructions">
+        <p><b>Instructions:</b></p>
+        <ul>
+          <li>You will get <b>15 seconds</b> per question.</li>
+          <li>Select the correct answer to score points.</li>
+          <li>If time runs out, the question is marked wrong.</li>
+          <li>At the end, you can download your summary.</li>
+        </ul>
+      </div>
+      <button id="start-btn">Start Quiz</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" style="display:none;">
+      <h1>SIMPLE QUIZ</h1>
+      <div class="progress-bar"><div id="progress"></div></div>
+      <div id="timer">Time Left: <span id="time">15</span>s</div>
+      <h2 id="question">Loading...</h2>
+      <div id="answers"></div>
+      <button id="next-btn">Next</button>
+      <button id="download-btn">Download Summary</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sounds -->
+<audio id="correct-sound" src="correct.mp3"></audio>
+<audio id="wrong-sound" src="wrong.mp3"></audio>
+
+<script>
+  const questions = [
+    {
+  question: "Choose the word that best completes the sentence: Despite his ___ nature, he made a few enemies in the office.",
+  answers: [
+    { text: "amiable", correct: true },
+    { text: "hostile", correct: false },
+    { text: "rude", correct: false },
+    { text: "aggressive", correct: false }
+  ]
+},
+{
+  question: "Select the word most nearly opposite in meaning to: OBSCURE",
+  answers: [
+    { text: "clear", correct: true },
+    { text: "dark", correct: false },
+    { text: "hidden", correct: false },
+    { text: "vague", correct: false }
+  ]
+},
+{
+  question: "Complete the sentence: The scientist's theory was considered ___ because it could not be proven by experiments.",
+  answers: [
+    { text: "speculative", correct: true },
+    { text: "definitive", correct: false },
+    { text: "concrete", correct: false },
+    { text: "accurate", correct: false }
+  ]
+},
+{
+  question: "Analogy: TREE is to FOREST as STAR is to ____",
+  answers: [
+    { text: "GALAXY", correct: true },
+    { text: "PLANET", correct: false },
+    { text: "SUN", correct: false },
+    { text: "MOON", correct: false }
+  ]
+},
+{
+  question: "Choose the word that best fits: Her remarks were so ___ that everyone understood her point immediately.",
+  answers: [
+    { text: "lucid", correct: true },
+    { text: "ambiguous", correct: false },
+    { text: "obscure", correct: false },
+    { text: "confusing", correct: false }
+  ]
+}
+
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let timeLeft = 15;
+  let timer;
+  let summary = [];
+
+  const questionEl = document.getElementById("question");
+  const answersEl = document.getElementById("answers");
+  const nextBtn = document.getElementById("next-btn");
+  const downloadBtn = document.getElementById("download-btn");
+  const timerEl = document.getElementById("time");
+  const progressEl = document.getElementById("progress");
+  const correctSound = document.getElementById("correct-sound");
+  const wrongSound = document.getElementById("wrong-sound");
+  const toggleBtn = document.querySelector(".toggle-btn");
+
+  const introScreen = document.getElementById("intro-screen");
+  const quizScreen = document.getElementById("quiz-screen");
+  const startBtn = document.getElementById("start-btn");
+
+  startBtn.style.display = "inline-block";
+
+  startBtn.addEventListener("click", () => {
+    introScreen.style.display = "none";
+    quizScreen.style.display = "block";
+    startQuiz();
+  });
+
+  function startQuiz() {
+    currentIndex = 0;
+    score = 0;
+    summary = [];
+    showQuestion();
+  }
+
+  function showQuestion() {
+    resetState();
+    let current = questions[currentIndex];
+    questionEl.textContent = current.question;
+    current.answers.forEach(ans => {
+      const btn = document.createElement("button");
+      btn.innerText = ans.text;
+      btn.classList.add("answer");
+      if (ans.correct) btn.dataset.correct = ans.correct;
+      btn.addEventListener("click", selectAnswer);
+      answersEl.appendChild(btn);
+    });
+    updateProgress();
+    startTimer();
+  }
+
+  function resetState() {
+    clearInterval(timer);
+    timeLeft = 15;
+    timerEl.textContent = timeLeft;
+    nextBtn.style.display = "none";
+    answersEl.innerHTML = "";
+  }
+
+  function selectAnswer(e) {
+    clearInterval(timer);
+    const selected = e.target;
+    const correct = selected.dataset.correct === "true";
+    if (correct) {
+      score++;
+      correctSound.play();
+    } else {
+      wrongSound.play();
+    }
+    Array.from(answersEl.children).forEach(btn => {
+      setStatusClass(btn, btn.dataset.correct === "true");
+      btn.disabled = true;
+    });
+    summary.push({
+      q: questions[currentIndex].question,
+      selected: selected.innerText,
+      correct: correct
+    });
+    nextBtn.style.display = "block"; // Show only after answer
+  }
+
+  function setStatusClass(element, correct) {
+    if (correct) element.classList.add("correct");
+    else element.classList.add("wrong");
+  }
+
+  function startTimer() {
+    timer = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        // Mark answers, wrong sound
+        Array.from(answersEl.children).forEach(btn => {
+          setStatusClass(btn, btn.dataset.correct === "true");
+          btn.disabled = true;
+        });
+        wrongSound.currentTime = 0;
+        wrongSound.play();
+        summary.push({
+          q: questions[currentIndex].question,
+          selected: "Timed Out",
+          correct: false
+        });
+        nextBtn.style.display = "block"; // Show after timeout
+      }
+    }, 1000);
+  }
+
+  function updateProgress() {
+    progressEl.style.width = ((currentIndex + 1) / questions.length) * 100 + "%";
+  }
+
+  nextBtn.addEventListener("click", () => {
+    currentIndex++;
+    if (currentIndex < questions.length) {
+      showQuestion();
+    } else {
+      quizOver();
+    }
+  });
+
+  function quizOver() {
+    questionEl.textContent = `Quiz Finished! Your score: ${score}/${questions.length}`;
+    answersEl.innerHTML = "";
+    nextBtn.style.display = "none";
+    downloadBtn.style.display = "inline-block";
+  }
+
+  // Download quiz summary
+  downloadBtn.addEventListener("click", () => {
+    const content = summary
+      .map((ans, i) => `Q${i + 1}: ${ans.q}\nYour Answer: ${ans.selected} - ${ans.correct ? "Correct ✅" : "Wrong ❌"}`)
+      .join("\n\n");
+
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "quiz-summary.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  function toggleTheme() {
+    document.body.classList.toggle("light");
+    if (document.body.classList.contains("light")) {
+      toggleBtn.textContent = "🌑 Dark Mode";
+    } else {
+      toggleBtn.textContent = "🌙 Light Mode";
+    }
+  }
+</script>
+</body>
+</html>
