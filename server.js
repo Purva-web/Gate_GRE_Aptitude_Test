@@ -144,6 +144,10 @@ app.get('/', (req, res) => {
 });
 
 // ==================== SERVER START ====================
+// Serve main pages
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
+app.get("/login", (req, res) => res.sendFile(path.join(__dirname, "login.html")));
+app.get("/signup", (req, res) => res.sendFile(path.join(__dirname, "signup.html")));
 
 app.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
