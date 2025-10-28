@@ -20,7 +20,8 @@ async function initDB() {
 initDB();
 
 app.use(bodyParser.json());
-app.use(express.static(__dirname)); // Serve static files
+app.use(express.static(path.join(__dirname, "public")));
+ // Serve static files
 
 // Register route
 app.post('/register', async (req, res) => {
