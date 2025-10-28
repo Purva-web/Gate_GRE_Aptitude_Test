@@ -5,7 +5,7 @@ const { Low, JSONFile } = require('lowdb');
 const path = require('path');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Setup LowDB
 const file = path.join(__dirname, 'db.json');
@@ -20,8 +20,9 @@ async function initDB() {
 initDB();
 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
- // Serve static files
+app.use(express.static(__dirname)); // Serve static files (HTML, CSS, JS)
+
+// ==================== USER MANAGEMENT ====================
 
 // Register route
 app.post('/register', async (req, res) => {
@@ -33,8 +34,7 @@ app.post('/register', async (req, res) => {
   }
 
   db.data.users.push({ username, password });
-  // Reassign sequential IDs
-  db.data.users.forEach((u, index) => u.id = index + 1);
+  db.data.users.forEach((u, index) => (u.id = index + 1));
 
   await db.write();
   res.json({ message: "Registration successful!" });
@@ -49,7 +49,7 @@ app.post('/login', async (req, res) => {
   res.json({ message: "Invalid username or password." });
 });
 
-// Add new user (admin)
+// Admin add user
 app.post('/users', async (req, res) => {
   const { username, password } = req.body;
   await db.read();
@@ -59,7 +59,7 @@ app.post('/users', async (req, res) => {
   }
 
   db.data.users.push({ username, password });
-  db.data.users.forEach((u, index) => u.id = index + 1);
+  db.data.users.forEach((u, index) => (u.id = index + 1));
 
   await db.write();
   res.json({ message: "User added.", users: db.data.users });
@@ -76,7 +76,7 @@ app.delete('/users/:id', async (req, res) => {
   const id = parseInt(req.params.id);
   await db.read();
   db.data.users = db.data.users.filter(u => u.id !== id);
-  db.data.users.forEach((u, index) => u.id = index + 1);
+  db.data.users.forEach((u, index) => (u.id = index + 1));
   await db.write();
   res.json({ message: "User deleted.", users: db.data.users });
 });
@@ -94,19 +94,16 @@ app.put('/users/:id', async (req, res) => {
   res.json({ message: "User updated." });
 });
 
-// Serve index.html
-app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+// ==================== QUESTION MANAGEMENT ====================
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+const questionsFile = path.join(__dirname, 'questions.json');
+if (!fs.existsSync(questionsFile))
+  fs.writeFileSync(questionsFile, JSON.stringify({ questions: [] }, null, 2));
 
-
+// Get all questions (filtered)
 app.get('/questions', (req, res) => {
   const { exam, category } = req.query;
-  const questionsDB = JSON.parse(fs.readFileSync(path.join(__dirname, 'questions.json')));
+  const questionsDB = JSON.parse(fs.readFileSync(questionsFile));
   let questions = questionsDB.questions;
 
   if (exam) questions = questions.filter(q => q.exam === exam);
@@ -114,59 +111,40 @@ app.get('/questions', (req, res) => {
 
   res.json(questions);
 });
-const questionsFile = path.join(__dirname, 'questions.json');
 
-// Ensure file exists
-if(!fs.existsSync(questionsFile)) fs.writeFileSync(questionsFile, JSON.stringify({questions: []}, null, 2));
-
+// Add question
 app.post('/add-question', (req, res) => {
   const { exam, category, question, options, answer } = req.body;
-  if(!exam || !category || !question || !options || !answer) {
-    return res.status(400).json({message: "All fields are required"});
+  if (!exam || !category || !question || !options || !answer) {
+    return res.status(400).json({ message: "All fields are required" });
   }
 
-  const db = JSON.parse(fs.readFileSync(questionsFile));
-  const id = db.questions.length ? db.questions[db.questions.length - 1].id + 1 : 1;
+  const data = JSON.parse(fs.readFileSync(questionsFile));
+  const id = data.questions.length ? data.questions[data.questions.length - 1].id + 1 : 1;
 
-  db.questions.push({ id, exam, category, question, options, answer });
-  fs.writeFileSync(questionsFile, JSON.stringify(db, null, 2));
-  res.json({message: "Question added successfully!"});
-});
-
-// Read questions by exam and category
-app.get('/questions/:exam/:category', async (req, res) => {
-  const { exam, category } = req.params;
-  await db.read();
-  const questions = db.data.questions?.[exam]?.[category] || [];
-  res.json(questions);
-});
-
-// Add new question
-app.post('/questions/add', async (req, res) => {
-  const { exam, category, question, options, answer } = req.body;
-  await db.read();
-  if (!db.data.questions[exam]) db.data.questions[exam] = {};
-  if (!db.data.questions[exam][category]) db.data.questions[exam][category] = [];
-  const list = db.data.questions[exam][category];
-  const newQuestion = {
-    id: list.length + 1,
-    question,
-    options,
-    answer
-  };
-  list.push(newQuestion);
-  await db.write();
-  res.json({ message: "Question added!", question: newQuestion });
+  data.questions.push({ id, exam, category, question, options, answer });
+  fs.writeFileSync(questionsFile, JSON.stringify(data, null, 2));
+  res.json({ message: "Question added successfully!" });
 });
 
 // Delete question
-app.delete('/questions/:exam/:category/:id', async (req, res) => {
+app.delete('/questions/:exam/:category/:id', (req, res) => {
   const { exam, category, id } = req.params;
-  await db.read();
-  if (!db.data.questions[exam] || !db.data.questions[exam][category]) {
-    return res.status(404).json({ message: "Category not found." });
-  }
-  db.data.questions[exam][category] = db.data.questions[exam][category].filter(q => q.id != id);
-  await db.write();
+  const data = JSON.parse(fs.readFileSync(questionsFile));
+  data.questions = data.questions.filter(q => !(q.exam === exam && q.category === category && q.id == id));
+  fs.writeFileSync(questionsFile, JSON.stringify(data, null, 2));
   res.json({ message: "Question deleted." });
+});
+
+// ==================== ROUTING ====================
+
+// Home route → index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// ==================== SERVER START ====================
+
+app.listen(PORT, () => {
+  console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
