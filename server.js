@@ -1,3 +1,4 @@
+const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Low, JSONFile } = require('lowdb');
@@ -100,8 +101,7 @@ app.get('/index.html', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-const fs = require('fs');
-const path = require('path');
+
 
 app.get('/questions', (req, res) => {
   const { exam, category } = req.query;
